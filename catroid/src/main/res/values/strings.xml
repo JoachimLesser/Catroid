@@ -998,6 +998,7 @@
     <string name="title_other_devices">New devices</string>
     <string name="searching_devices">Looking for devices…</string>
     <string name="button_scan">Search Bluetooth devices</string>
+    <string name="easy_pairing">Easy Pairing with NFC</string>
     <string name="select_device">Select Device:</string>
     <string name="connecting_please_wait">Connecting to your device.\nPlease wait…</string>
     <!-- <string name="pairing_message">After pairing, connect.</string> -->

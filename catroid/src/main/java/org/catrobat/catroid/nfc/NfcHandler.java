@@ -248,4 +248,52 @@ public final class NfcHandler {
 	public static String deleteProtocolPrefixIfExist(String url) {
 		return url.replaceFirst("^\\w+://", "");
 	}
+
+	public static String handleBluetoothSecureSimplePairingRecordIntent(Intent intent) {
+		String message = getHexPayloadFromIntent(intent);
+
+		return getMacAddressFromNfcIntentMessage(message);
+	}
+
+	private static String getHexPayloadFromIntent(Intent intent) {
+		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+			Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+			if (rawMsgs != null) {
+				NdefMessage message = (NdefMessage) rawMsgs[0];
+				if (message != null) {
+					String result = "";
+					byte[] payload = message.getRecords()[0].getPayload();
+					if (payload.length > 0) {
+						result = byteArrayToHex(payload);
+					}
+					return result;
+				}
+			}
+		}
+		return null;
+	}
+
+	private static String getMacAddressFromNfcIntentMessage(String message) {
+		int macStartPositionInPayload = 4;
+		int macHexLength = 12;
+		int macEndPositionInPayload = macStartPositionInPayload + macHexLength;
+		String invertedMac = message.substring(macStartPositionInPayload, macEndPositionInPayload);
+		String[] splitted = splitInPiecesOfSizeTwo(invertedMac);
+		String correctMac = "";
+		for (int i = splitted.length - 1; i >= 0; i--) {
+			correctMac += splitted[i];
+			if (i > 0) {
+				correctMac += ":";
+			}
+		}
+		return correctMac;
+	}
+
+	private static String[] splitInPiecesOfSizeTwo(String longString) {
+		String[] shortStrings = new String[longString.length() / 2];
+		for (int i = 0; i < longString.length() / 2; i++) {
+			shortStrings[i] = longString.substring(i * 2, i * 2 + 2);
+		}
+		return shortStrings;
+	}
 }
